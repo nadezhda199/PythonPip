@@ -1,14 +1,8 @@
 import logging
 from math import sqrt
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
-from telegram.ext import (
-    Updater,
-    CommandHandler,
-    MessageHandler,
-    Filters,
-    ConversationHandler,
-)
-from comply import compl_1, compl_2
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler
+
 
 logging.basicConfig(filename='my_log', filemode='a', encoding='utf-8',
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -27,26 +21,20 @@ CATCHREPLY5, CATCHREPLY6, CATCHREPLY7, MULTIPLY, SUM_COMPL, SUBTRACTION_COMPL, D
 INT_DIV_COMPL, DIV_COMPL, MULTIPLY_COMPL = range(21)
 
 
-def start(update, _):
-    # Начинаем разговор с вопроса
-    update.message.reply_text(
-        'Здравствуйте, вас приветсвует телеграм-калькулятор. Для продолжения нажмите любую клавишу')
-
+def start(update, _):# Начинаем разговор с вопроса
+    start_key = [['Начать работу']] # Список кнопок для ответа
+    markup_key = ReplyKeyboardMarkup(start_key, True)# Создаем простую клавиатуру для ответа
+    update.message.reply_text(f'Здравствуйте {update.message.from_user.first_name}, вас приветсвует телеграм-калькулятор.', 
+                                reply_markup=markup_key)
     return MAINMENU
 
 
 def mainmenu(update, _):
     user = update.message.from_user
     logger.info("Пользователь %s начал работу с калькулятором.", user.first_name)
-    # Список кнопок для ответа
-    reply_keyboard = [['Рациональные', 'Комплексные', 'Выход']]
-    # Создаем простую клавиатуру для ответа
-    markup_key = ReplyKeyboardMarkup(reply_keyboard, True)
-    # Начинаем разговор с вопроса
-    update.message.reply_text(
-        'Выберите с какими числами вы хотите работать',
-        reply_markup=markup_key, )
-
+    reply_keyboard = [['Рациональные', 'Комплексные', 'Выход']] # Список кнопок для ответа
+    markup_key = ReplyKeyboardMarkup(reply_keyboard, True)# Создаем простую клавиатуру для ответа
+    update.message.reply_text('Выберите с какими числами вы хотите работать', reply_markup=markup_key)# Начинаем разговор с вопроса
     return CHOOSING  # выбор вида чисел
 
 
@@ -65,10 +53,7 @@ def choosing(update, _):
         return OPERCHOISE_COMPL  # меню выбора оператора
     elif num_choiсe == 'Выход':
         logger.info("Пользователь %s вышел", user.first_name)
-        update.message.reply_text(
-            'Спасибо, что посетили нас',
-            reply_markup=ReplyKeyboardRemove()
-        )
+        update.message.reply_text('Спасибо, что посетили нас', reply_markup=ReplyKeyboardRemove())
         return ConversationHandler.END
     else:
         pass
@@ -97,9 +82,7 @@ def oper_choice(update, _):
         update.message.reply_text('Введите два числа через пробел')
         return MULTIPLY  # вычисляет квадратный корень числа
     elif oper == "Главное меню":
-        update.message.reply_text(
-            'возвращение в главное меню',
-        )
+        update.message.reply_text('возвращение в главное меню')
         return MAINMENU
     else:
         pass
@@ -117,10 +100,10 @@ def oper_choice_compl(update, _):
         update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
         return DEGREE_COMPL  # возведение в степень комплексных чисел
     elif oper == "Деление":
-        reply_keyboard = [['Целочисленное', 'Обычное', 'Главное меню']]
-        markup_key = ReplyKeyboardMarkup(reply_keyboard, True)
-        update.message.reply_text('Выберите тип деления', reply_markup=markup_key)
-        return DIVISION_COMPL  # выбор вида деления
+        # reply_keyboard = [['Целочисленное', 'Обычное', 'Главное меню']]
+        # markup_key = ReplyKeyboardMarkup(reply_keyboard, True)
+        update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
+        return DIV_COMPL  
     elif oper == "Корень квадратный числа":
         update.message.reply_text('Введите действительную часть и мнимую часть чисела через пробелы')
         return SQRT_COMPL  # вычисляет квадратный корень комплексного числа
@@ -128,16 +111,13 @@ def oper_choice_compl(update, _):
         update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
         return MULTIPLY_COMPL  # умножение комплексных чисел
     elif oper == "Главное меню":
-        update.message.reply_text(
-            'возвращение в главное меню',
-        )
+        update.message.reply_text('возвращение в главное меню')
         return MAINMENU
     else:
         pass
 
 
 def division_ch(update, _):
-    # user = update.message.from_user
     msg = update.message.text
     if msg == 'Остаток':
         update.message.reply_text('Введите два числа через пробел')
@@ -156,26 +136,25 @@ def division_ch(update, _):
         return DIVISION
 
 
-def div_choice_compl(update, _):
-    msg = update.message.text
-    if msg == 'Целочисленное':
-        update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
-        return INT_DIV_COMPL
-    elif msg == 'Обычное':
-        update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
-        return DIV_COMPL
-    elif msg == "Главное меню":
-        update.message.reply_text('возвращение в главное меню')
-        return MAINMENU
-    else:
-        update.message.reply_text('Попобуйте еще раз выбрать')
-        return DIVISION_COMPL
+# def div_choice_compl(update, _):
+#     msg = update.message.text
+#     if msg == 'Целочисленное':
+#         update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
+#         return INT_DIV_COMPL
+#     elif msg == 'Обычное':
+#         update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
+#         return DIV_COMPL
+#     elif msg == "Главное меню":
+#         update.message.reply_text('возвращение в главное меню')
+#         return MAINMENU
+#     else:
+#         update.message.reply_text('Попобуйте еще раз выбрать')
+#         return DIVISION_COMPL
 
 
-def sum_oper(update, _):
+def sum_oper(update, _): # сложение
     user = update.message.from_user
     msg = update.message.text
-    print(msg)
     items = msg.split()  # /sum 123 534543
     try:
         x = float(items[0])
@@ -188,14 +167,13 @@ def sum_oper(update, _):
         return CATCHREPLY
 
 
-def sum_oper_compl(update, _):
+def sum_oper_compl(update, _): # сложение комплексные
     user = update.message.from_user
     msg = update.message.text
-    print(msg)
     items = msg.split()  # /sum 123 534543
     try:
-        x = compl_1(items)
-        y = compl_2(items)
+        x = complex(float(items[0]), float(items[1]))
+        y = complex(float(items[2]), float(items[3]))
         update.message.reply_text(f'{x}+{y} = {x + y}')
         logger.info("Пример пользователя %s: %s + %s = %s ", user.first_name, x, y, x + y)
         return OPERCHOISE_COMPL  # меню выбора оператора
@@ -204,10 +182,9 @@ def sum_oper_compl(update, _):
         return SUM_COMPL
 
 
-def subtraction_oper(update, _):
+def subtraction_oper(update, _): # вычетание
     user = update.message.from_user
     msg = update.message.text
-    print(msg)
     items = msg.split()
     try:
         x = float(items[0])
@@ -220,14 +197,13 @@ def subtraction_oper(update, _):
         return CATCHREPLY2
 
 
-def subtraction_oper_compl(update, _):
+def subtraction_oper_compl(update, _): # вычетание комплексные
     user = update.message.from_user
     msg = update.message.text
-    print(msg)
     items = msg.split()
     try:
-        x = compl_1(items)
-        y = compl_2(items)
+        x = complex(float(items[0]), float(items[1]))
+        y = complex(float(items[2]), float(items[3]))
         update.message.reply_text(f'{x}-{y} = {x - y}')
         logger.info("Пример пользователя %s: %s - %s = %s ", user.first_name, x, y, x - y)
         return OPERCHOISE_COMPL  # меню выбора оператора
@@ -236,10 +212,9 @@ def subtraction_oper_compl(update, _):
         return SUBTRACTION_COMPL
 
 
-def power_oper(update, _):
+def power_oper(update, _): # степень
     user = update.message.from_user
     msg = update.message.text
-    print(msg)
     items = msg.split()
     try:
         x = float(items[0])
@@ -252,14 +227,13 @@ def power_oper(update, _):
         return CATCHREPLY3
 
 
-def degree_oper_compl(update, _):
+def degree_oper_compl(update, _): # степень комплексные
     user = update.message.from_user
     msg = update.message.text
-    print(msg)
     items = msg.split()
     try:
-        x = compl_1(items)
-        y = compl_2(items)
+        x = complex(float(items[0]), float(items[1]))
+        y = complex(float(items[2]), float(items[3]))
         update.message.reply_text(f'{x}**{y} = {x ** y}')
         logger.info("Пример пользователя %s: %s ** %s = %s ", user.first_name, x, y, x ** y)
         return OPERCHOISE_COMPL  # меню выбора оператора
@@ -268,7 +242,7 @@ def degree_oper_compl(update, _):
         return DEGREE_COMPL
 
 
-def sqrt_oper(update, _):
+def sqrt_oper(update, _): # корень
     # user = update.message.from_user
     msg = update.message.text
     items = msg
@@ -281,12 +255,12 @@ def sqrt_oper(update, _):
         return CATCHREPLY4
 
 
-def sqrt_oper_compl(update, _):
+def sqrt_oper_compl(update, _): # корень комплексные
     # user = update.message.from_user
     msg = update.message.text
     items = msg.split()
     try:
-        x = compl_1(items)
+        x = complex(float(items[0]), float(items[1]))
         update.message.reply_text(f'√{x}= {round(sqrt(x), 2)}')
         return OPERCHOISE_COMPL  # меню выбора оператора
     except:
@@ -294,7 +268,7 @@ def sqrt_oper_compl(update, _):
         return SQRT_COMPL
 
 
-def div_rem(update, _):
+def div_rem(update, _): # остаток от деления
     msg = update.message.text
     items = msg.split()
     try:
@@ -315,8 +289,8 @@ def div_rem(update, _):
         return CATCHREPLY5
 
 
-def division_int(update, _):
-    user = update.message.from_user
+def division_int(update, _): #целочисленное деление
+    # user = update.message.from_user
     msg = update.message.text
     items = msg.split()
     try:
@@ -333,63 +307,51 @@ def division_int(update, _):
         return CATCHREPLY6
 
 
-def div_int_compl(update, _):
-    # user = update.message.from_user
-    msg = update.message.text
-    items = msg.split()
-    try:
-        x = compl_1(items)
-        y = compl_2(items)
-        if y != 0:
-            update.message.reply_text(f'{x}//{y} = {x // y}')
-            return DIVISION_COMPL
-        else:
-            update.message.reply_text('На ноль делить нельзя! Попробуйте еще раз')
-            return INT_DIV_COMPL
-    except:
-        update.message.reply_text('Вы ввели неправильно, введите еще раз')
-        return INT_DIV_COMPL
+# def div_int_compl(update, _):
+#     # user = update.message.from_user
+#     msg = update.message.text
+#     items = msg.split()
+#     try:
+#         x = complex(float(items[0]), float(items[1]))
+#         y = complex(float(items[2]), float(items[3]))
+#         res = x / y
+#         update.message.reply_text(f'{x}/{y} = {res}')
+#         return DIVISION_COMPL
+#     except:
+#         update.message.reply_text('Вы ввели неправильно, введите еще раз')
+#         return INT_DIV_COMPL
 
 
-def division(update, _):
+def division(update, _): # деление
     # user = update.message.from_user
     msg = update.message.text
     items = msg.split()
     try:
         x = float(items[0])
         y = float(items[1])
-        if y != 0:
-            update.message.reply_text(f'{x}/{y} = {round((x / y), 2)}')
-            return DIVISION
-        else:
-            update.message.reply_text('На ноль делить нельзя! Попробуйте еще раз')
-            return CATCHREPLY7
+        update.message.reply_text(f'{x}/{y} = {x / y}')
+        return DIVISION
     except:
         update.message.reply_text('Вы ввели неправильно, введите еще раз')
         return CATCHREPLY7
 
 
-def div_compl(update, _):
+def div_compl(update, _): #деление комплексные
     # user = update.message.from_user
     msg = update.message.text
     items = msg.split()
     try:
-        x = compl_1(items)
-        y = compl_2(items)
-        if items[2] != 0 or items[3] != 0:
-            update.message.reply_text(f'{x}/{y} = {round((x / y), 2)}')
-            return DIVISION_COMPL
-        else:
-            update.message.reply_text('На ноль делить нельзя! Попробуйте еще раз')
-            return DIV_COMPL
+        x = complex(float(items[0]), float(items[1]))
+        y = complex(float(items[2]), float(items[3]))
+        update.message.reply_text(f'{x}/{y} = {x / y}')
+        return OPERCHOISE_COMPL
     except:
         update.message.reply_text('Вы ввели неправильно, введите еще раз')
         return DIV_COMPL
 
 
-def multiply(update, _):
+def multiply(update, _): #умножение
     msg = update.message.text
-    print(msg)
     items = msg.split()
     try:
         x = float(items[0])
@@ -402,12 +364,12 @@ def multiply(update, _):
         return MULTIPLY
 
 
-def multiply_compl(update, _):
+def multiply_compl(update, _): #умножение комплексные
     msg = update.message.text
     items = msg.split()
     try:
-        x = compl_1(items)
-        y = compl_2(items)
+        x = complex(float(items[0]), float(items[1]))
+        y = complex(float(items[2]), float(items[3]))
         update.message.reply_text(f'{x}*{y} = {x * y}')
         logger.info("Пример пользователя %s: %s * %s = %s ", update.message.from_user.first_name, x, y, x ** y)
         return OPERCHOISE_COMPL  # меню выбора оператора
@@ -416,13 +378,10 @@ def multiply_compl(update, _):
         return MULTIPLY_COMPL
 
 
-def cancel(update, _):
+def cancel(update, _): # завершение разговора
     user = update.message.from_user
     logger.info("User %s finished work with calculator.", user.first_name)
-    update.message.reply_text(
-        'Спасибо, что посетили нас',
-        reply_markup=ReplyKeyboardRemove()
-    )
+    update.message.reply_text('Спасибо, что посетили нас', reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
 
@@ -443,7 +402,7 @@ if __name__ == '__main__':
             OPERCHOISE: [MessageHandler(Filters.regex(f'^{operation_keybord_main}$'), oper_choice)],
             OPERCHOISE_COMPL: [MessageHandler(Filters.regex(f'^{operation_keybord_main}$'), oper_choice_compl)],
             DIVISION: [MessageHandler(Filters.regex('^(Остаток|Целочисленное|Обычное|Главное меню)$'), division_ch)],
-            DIVISION_COMPL: [MessageHandler(Filters.regex('^(Целочисленное|Обычное|Главное меню)$'), div_choice_compl)],
+            # DIVISION_COMPL: [MessageHandler(Filters.regex('^(Целочисленное|Обычное|Главное меню)$'), div_choice_compl)],
             CATCHREPLY: [MessageHandler(Filters.text & ~Filters.command, sum_oper)],
             SUM_COMPL: [MessageHandler(Filters.text & ~Filters.command, sum_oper_compl)],
             CATCHREPLY2: [MessageHandler(Filters.text & ~Filters.command, subtraction_oper)],
@@ -454,7 +413,7 @@ if __name__ == '__main__':
             SQRT_COMPL: [MessageHandler(Filters.text & ~Filters.command, sqrt_oper_compl)],
             CATCHREPLY5: [MessageHandler(Filters.text & ~Filters.command, div_rem)],
             CATCHREPLY6: [MessageHandler(Filters.text & ~Filters.command, division_int)],
-            INT_DIV_COMPL: [MessageHandler(Filters.text & ~Filters.command, div_int_compl)],
+            # INT_DIV_COMPL: [MessageHandler(Filters.text & ~Filters.command, div_int_compl)],
             CATCHREPLY7: [MessageHandler(Filters.text & ~Filters.command, division)],
             DIV_COMPL: [MessageHandler(Filters.text & ~Filters.command, div_compl)],
             MULTIPLY: [MessageHandler(Filters.text & ~Filters.command, multiply)],
