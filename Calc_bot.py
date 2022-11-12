@@ -17,8 +17,8 @@ operation_keybord = [["Сложение", "Вычитание", "Умножен�
 operation_keybord_main = "Сложение|Вычитание|Умножение|Деление|Возведение в степень|Корень квадратный числа|Главное меню"
 
 MAINMENU, CHOOSING, OPERCHOISE, OPERCHOISE_COMPL, CATCHREPLY, CATCHREPLY2, CATCHREPLY3, CATCHREPLY4, DIVISION, \
-CATCHREPLY5, CATCHREPLY6, CATCHREPLY7, MULTIPLY, SUM_COMPL, SUBTRACTION_COMPL, DEGREE_COMPL, SQRT_COMPL, DIVISION_COMPL, \
-INT_DIV_COMPL, DIV_COMPL, MULTIPLY_COMPL = range(21)
+CATCHREPLY5, CATCHREPLY6, CATCHREPLY7, MULTIPLY, SUM_COMPL, SUBTRACTION_COMPL, DEGREE_COMPL, SQRT_COMPL, \
+DIV_COMPL, MULTIPLY_COMPL = range(19)
 
 
 def start(update, _):# Начинаем разговор с вопроса
@@ -100,8 +100,6 @@ def oper_choice_compl(update, _):
         update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
         return DEGREE_COMPL  # возведение в степень комплексных чисел
     elif oper == "Деление":
-        # reply_keyboard = [['Целочисленное', 'Обычное', 'Главное меню']]
-        # markup_key = ReplyKeyboardMarkup(reply_keyboard, True)
         update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
         return DIV_COMPL  
     elif oper == "Корень квадратный числа":
@@ -134,22 +132,6 @@ def division_ch(update, _):
     else:
         update.message.reply_text('Попобуйте еще раз выбрать')
         return DIVISION
-
-
-# def div_choice_compl(update, _):
-#     msg = update.message.text
-#     if msg == 'Целочисленное':
-#         update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
-#         return INT_DIV_COMPL
-#     elif msg == 'Обычное':
-#         update.message.reply_text('Введите действительную часть и мнимую часть двух чисел через пробелы')
-#         return DIV_COMPL
-#     elif msg == "Главное меню":
-#         update.message.reply_text('возвращение в главное меню')
-#         return MAINMENU
-#     else:
-#         update.message.reply_text('Попобуйте еще раз выбрать')
-#         return DIVISION_COMPL
 
 
 def sum_oper(update, _): # сложение
@@ -307,21 +289,6 @@ def division_int(update, _): #целочисленное деление
         return CATCHREPLY6
 
 
-# def div_int_compl(update, _):
-#     # user = update.message.from_user
-#     msg = update.message.text
-#     items = msg.split()
-#     try:
-#         x = complex(float(items[0]), float(items[1]))
-#         y = complex(float(items[2]), float(items[3]))
-#         res = x / y
-#         update.message.reply_text(f'{x}/{y} = {res}')
-#         return DIVISION_COMPL
-#     except:
-#         update.message.reply_text('Вы ввели неправильно, введите еще раз')
-#         return INT_DIV_COMPL
-
-
 def division(update, _): # деление
     # user = update.message.from_user
     msg = update.message.text
@@ -402,7 +369,6 @@ if __name__ == '__main__':
             OPERCHOISE: [MessageHandler(Filters.regex(f'^{operation_keybord_main}$'), oper_choice)],
             OPERCHOISE_COMPL: [MessageHandler(Filters.regex(f'^{operation_keybord_main}$'), oper_choice_compl)],
             DIVISION: [MessageHandler(Filters.regex('^(Остаток|Целочисленное|Обычное|Главное меню)$'), division_ch)],
-            # DIVISION_COMPL: [MessageHandler(Filters.regex('^(Целочисленное|Обычное|Главное меню)$'), div_choice_compl)],
             CATCHREPLY: [MessageHandler(Filters.text & ~Filters.command, sum_oper)],
             SUM_COMPL: [MessageHandler(Filters.text & ~Filters.command, sum_oper_compl)],
             CATCHREPLY2: [MessageHandler(Filters.text & ~Filters.command, subtraction_oper)],
@@ -413,7 +379,6 @@ if __name__ == '__main__':
             SQRT_COMPL: [MessageHandler(Filters.text & ~Filters.command, sqrt_oper_compl)],
             CATCHREPLY5: [MessageHandler(Filters.text & ~Filters.command, div_rem)],
             CATCHREPLY6: [MessageHandler(Filters.text & ~Filters.command, division_int)],
-            # INT_DIV_COMPL: [MessageHandler(Filters.text & ~Filters.command, div_int_compl)],
             CATCHREPLY7: [MessageHandler(Filters.text & ~Filters.command, division)],
             DIV_COMPL: [MessageHandler(Filters.text & ~Filters.command, div_compl)],
             MULTIPLY: [MessageHandler(Filters.text & ~Filters.command, multiply)],
